@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+  // output   = "./node_modules/.prisma/client"
+}
+
+generator nestgraphql {
+  provider          = "node node_modules/prisma-nestjs-graphql"
+  output            = "../src/prisma-model-graphql"
+  outputFilePattern = "/{type}/{name}.{type}.ts"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id            Int             @id @default(autoincrement())
+  createdTime   DateTime        @default(now())
+  updateTime    DateTime        @default(now())
+  code          String
+  label         String
+  UserRolesRole UserRolesRole[]
+}
+
+model Task {
+  id         Int         @id @default(autoincrement())
+  createTime DateTime    @default(now())
+  updateTime DateTime    @default(now())
+  name       String
+  status     Task_status @default(TO_DO)
+  createById Int
+  updateById Int?
+  taskListId Int?
+  TaskList   TaskList?   @relation(fields: [taskListId], references: [id])
+
+  @@index([taskListId], map: "Task_taskListId_fkey")
+}
+
+model TaskList {
+  id          Int             @id @default(autoincrement())
+  createdTime DateTime        @default(now())
+  updateTime  DateTime        @default(now())
+  createById  Int
+  updateById  Int?
+  status      TaskList_status @default(ACTIVE)
+  name        String
+  Task        Task[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model User {
+  id                Int             @id @default(autoincrement())
+  createdTime       DateTime        @default(now())
+  updateTime        DateTime        @default(now())
+  username          String          @unique
+  encryptedPassword String
+  locked            Int             @default(1)
+  enabled           Int             @default(0)
+  UserRolesRole     UserRolesRole[]
+}
+
+model UserRolesRole {
+  id     Int  @id @default(autoincrement())
+  userId Int
+  roleId Int
+  Role   Role @relation(fields: [roleId], references: [id])
+  User   User @relation(fields: [userId], references: [id])
+
+  @@index([roleId], map: "UserRolesRole_roleId_fkey")
+  @@index([userId], map: "UserRolesRole_userId_fkey")
+}
+
+enum Task_status {
+  TO_DO
+  DOING
+  DONE
+}
+
+enum TaskList_status {
+  CLOSE
+  ACTIVE
+}

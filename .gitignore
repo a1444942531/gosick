@@ -1,0 +1,29 @@
+node_modules
+# Keep environment variables out of version control
+# .env
+dist
+logs
+*.log
+
+
+
+# Nuxt dev/build outputs
+.output
+.data
+.nuxt
+.nitro
+.cache
+
+# Logs
+
+# Misc
+.DS_Store
+.fleet
+.idea
+
+# Local env files
+.env
+.env.*
+!.env.example
+
+src/prisma-model-graphql
