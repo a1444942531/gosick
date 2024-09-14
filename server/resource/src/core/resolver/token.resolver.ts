@@ -24,17 +24,19 @@ export class TokenResolver {
         return this.authService.createToken(tokenCreateDto)
     }
 
-    @Mutation(() => User, { description: "创建用户" })
+    @Mutation(() => String, { description: "创建用户并返回token" })
     async createUser(@Args('createUser') createUser: CreateUser) {
         const { username, password } = createUser;
 
         const salt = await bcrypt.genSalt(10)
         const encryptedPassword = await bcrypt.hash(password, salt)
 
-        return this.userService.create({
+        await this.userService.create({
             username,
             encryptedPassword
         })
+
+        return this.authService.createToken(createUser)
     }
 
     @Query(() => String)
